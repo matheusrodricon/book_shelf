@@ -15,6 +15,8 @@ const { auth } = require('./middleware/auth');
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+app.use(express.static('client/build'));
+
 
 // GET
 app.get('/api/auth', auth, (req, res) => {
@@ -129,9 +131,6 @@ app.post('/api/login', (req, res) => {
 	})
 })
 
-
-
-
 // UPDATE
 app.post('/api/book_update', (req, res) => {
 	Book.findByIdAndUpdate(req.body._id, req.body, {new:true}, (err, doc) =>{
@@ -152,6 +151,15 @@ app.delete('/api/delete_book', (req, res)=> {
 		res.json(true);
 	})
 })
+
+if(process.env.NODE_ENV === 'production'){
+	const path = require('path');
+
+	app.get('/*', () => {
+		res.sendfile(path.resolve(__dirname, '../client', 'build', 'index.html'));
+	})
+}
+
 
 const port = process.env.PORT || 3001
 app.listen(port, () => {
